@@ -1,0 +1,49 @@
+open-webui:
+  persistence:
+    storageClass: gp3
+
+  ingress:
+    enabled: true
+    class: alb
+    host: "chat.example.internal"
+    tls: false
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internal
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/backend-protocol: HTTP
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/healthcheck-path: /health
+      alb.ingress.kubernetes.io/certificate-arn: "<acm-certificate-arn>"
+      external-dns.alpha.kubernetes.io/hostname: "chat.example.internal"
+
+  sso:
+    oidc:
+      clientId: "<entra-client-id>"
+      providerUrl: "https://login.microsoftonline.com/<tenant-id>/v2.0/.well-known/openid-configuration"
+
+  extraEnvVars:
+    - name: OPENAI_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: open-webui-runtime
+          key: openai-api-key
+    - name: WEBUI_SECRET_KEY
+      valueFrom:
+        secretKeyRef:
+          name: open-webui-runtime
+          key: webui-secret-key
+    - name: WEBUI_URL
+      value: "https://chat.example.internal"
+    - name: OPENID_REDIRECT_URI
+      value: "https://chat.example.internal/oauth/oidc/callback"
+    - name: ENABLE_OAUTH_PERSISTENT_CONFIG
+      value: "false"
+    - name: ENABLE_SIGNUP
+      value: "false"
+    - name: ENABLE_LOGIN_FORM
+      value: "false"
+    - name: ENABLE_PASSWORD_AUTH
+      value: "false"
+    - name: DEFAULT_USER_ROLE
+      value: "pending"

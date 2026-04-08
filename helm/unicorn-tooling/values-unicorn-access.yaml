@@ -1,0 +1,9 @@
+qdrant:
+  networkPolicy:
+    allowFromWorkloads:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: unicorn
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: unicorn

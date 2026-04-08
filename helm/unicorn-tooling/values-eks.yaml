@@ -1,0 +1,27 @@
+# Example overrides for an Amazon EKS deployment.
+
+qdrant:
+  persistence:
+    storageClass: gp3
+  serviceAccount:
+    annotations: {}
+  networkPolicy:
+    # Example for later unicorn access within the same namespace:
+    # allowFromWorkloads:
+    #   - podSelector:
+    #       matchLabels:
+    #         app.kubernetes.io/name: unicorn
+    allowFromWorkloads: []
+
+prometheus:
+  persistence:
+    storageClass: gp3
+  serviceAccount:
+    annotations: {}
+
+grafana:
+  adminPassword: "override-via-secret-or-values"
+  persistence:
+    storageClass: gp3
+  serviceAccount:
+    annotations: {}

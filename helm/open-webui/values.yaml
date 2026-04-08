@@ -1,0 +1,90 @@
+open-webui:
+  replicaCount: 1
+  revisionHistoryLimit: 3
+
+  serviceAccount:
+    name: ""
+
+  podLabels:
+    unicorn.ai/access-client: open-webui
+
+  ollama:
+    enabled: false
+
+  pipelines:
+    enabled: false
+
+  tika:
+    enabled: false
+
+  websocket:
+    enabled: true
+    manager: redis
+    redis:
+      enabled: true
+
+  persistence:
+    enabled: true
+    provider: local
+    size: 10Gi
+    accessModes:
+      - ReadWriteOnce
+    storageClass: ""
+
+  service:
+    type: ClusterIP
+    port: 80
+    containerPort: 8080
+
+  enableOpenaiApi: true
+  openaiBaseApiUrl: "http://unicorn.unicorn.svc.cluster.local:8000/v1"
+  openaiApiKey: ""
+
+  ingress:
+    enabled: true
+    class: alb
+    host: "chat.example.internal"
+    tls: false
+    annotations: {}
+
+  sso:
+    enabled: true
+    enableSignup: true
+    mergeAccountsByEmail: false
+    enableRoleManagement: false
+    enableGroupManagement: false
+
+    oidc:
+      enabled: true
+      clientId: "<entra-client-id>"
+      clientExistingSecret: open-webui-runtime
+      clientExistingSecretKey: oidc-client-secret
+      providerUrl: "https://login.microsoftonline.com/<tenant-id>/v2.0/.well-known/openid-configuration"
+      providerName: "Entra ID"
+      scopes: "openid email profile"
+
+  extraEnvVars:
+    - name: OPENAI_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: open-webui-runtime
+          key: openai-api-key
+    - name: WEBUI_SECRET_KEY
+      valueFrom:
+        secretKeyRef:
+          name: open-webui-runtime
+          key: webui-secret-key
+    - name: WEBUI_URL
+      value: "https://chat.example.internal"
+    - name: OPENID_REDIRECT_URI
+      value: "https://chat.example.internal/oauth/oidc/callback"
+    - name: ENABLE_OAUTH_PERSISTENT_CONFIG
+      value: "false"
+    - name: ENABLE_SIGNUP
+      value: "false"
+    - name: ENABLE_LOGIN_FORM
+      value: "false"
+    - name: ENABLE_PASSWORD_AUTH
+      value: "false"
+    - name: DEFAULT_USER_ROLE
+      value: "pending"

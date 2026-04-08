@@ -1,0 +1,33 @@
+{{- if .Values.grafana.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "unicorn-tooling.grafanaFullname" . }}-config
+  labels:
+    {{- include "unicorn-tooling.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana
+data:
+  datasources.yml: |
+    apiVersion: 1
+
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://{{ include "unicorn-tooling.prometheusFullname" . }}:{{ .Values.prometheus.service.port }}
+        isDefault: true
+        editable: true
+  dashboards.yml: |
+    apiVersion: 1
+
+    providers:
+      - name: Local Dashboards
+        orgId: 1
+        folder: ""
+        type: file
+        disableDeletion: false
+        updateIntervalSeconds: 30
+        allowUiUpdates: true
+        options:
+          path: /var/lib/grafana/dashboards
+{{- end }}

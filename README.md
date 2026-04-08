@@ -63,10 +63,27 @@ Empfohlener Start:
 ## Weitere Doku
 
 - [STACK-README.md](/Users/t.bettmann/Documents/dev/Agents/SDLC-Design/unicornTooling/STACK-README.md)
+- [Helm Chart README](/Users/t.bettmann/Documents/dev/Agents/SDLC-Design/unicornTooling/helm/unicorn-tooling/README.md)
+- [Open WebUI Helm Wrapper](/Users/t.bettmann/Documents/dev/Agents/SDLC-Design/unicornTooling/helm/open-webui/README.md)
+
+## Kubernetes
+
+Ein erster Helm-Chart fuer den K8s-Einstieg liegt unter:
+
+- [helm/unicorn-tooling](/Users/t.bettmann/Documents/dev/Agents/SDLC-Design/unicornTooling/helm/unicorn-tooling)
+- [helm/open-webui](/Users/t.bettmann/Documents/dev/Agents/SDLC-Design/unicornTooling/helm/open-webui) fuer das getrennte interne Access-Frontend
+
+Beispiel:
+
+```bash
+cd unicornTooling
+helm upgrade --install unicorn-tooling ./helm/unicorn-tooling -n unicorn-tooling --create-namespace
+```
 
 ## Naechste sinnvolle Ausbaustufen
 
 - separates Deployment fuer Unicorn Runtime
+- separates Access-Frontend fuer menschliche Nutzer per Open WebUI
 - Secret-Management und Environment-Templates
 - Reverse Proxy / TLS
 - Backup- und Restore-Strategien fuer Qdrant

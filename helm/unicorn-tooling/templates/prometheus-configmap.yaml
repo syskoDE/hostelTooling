@@ -1,0 +1,38 @@
+{{- if .Values.prometheus.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "unicorn-tooling.prometheusFullname" . }}-config
+  labels:
+    {{- include "unicorn-tooling.labels" . | nindent 4 }}
+    app.kubernetes.io/component: prometheus
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    rule_files:
+      - /etc/prometheus/rules.yml
+
+    scrape_configs:
+      - job_name: qdrant
+        metrics_path: /metrics
+        static_configs:
+          - targets: ["{{ include "unicorn-tooling.qdrantFullname" . }}:{{ .Values.qdrant.service.port }}"]
+
+      - job_name: prometheus
+        static_configs:
+          - targets: ["{{ include "unicorn-tooling.prometheusFullname" . }}:{{ .Values.prometheus.service.port }}"]
+  rules.yml: |
+    groups:
+      - name: qdrant-alerts
+        rules:
+          - alert: QdrantDown
+            expr: up{job="qdrant"} == 0
+            for: 1m
+            labels:
+              severity: critical
+            annotations:
+              summary: Qdrant ist nicht erreichbar
+{{- end }}
