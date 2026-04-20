@@ -1,0 +1,15 @@
+qdrant:
+  networkPolicy:
+    allowFromWorkloads:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: hostel
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: hostel
+
+prometheus:
+  enabled: false
+
+grafana:
+  enabled: false

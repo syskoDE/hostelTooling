@@ -1,0 +1,59 @@
+{{- if and .Values.qdrant.enabled .Values.qdrant.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "hostel-tooling.qdrantFullname" . }}
+  labels:
+    {{- include "hostel-tooling.labels" . | nindent 4 }}
+    app.kubernetes.io/component: qdrant
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "hostel-tooling.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: qdrant
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              {{- include "hostel-tooling.selectorLabels" . | nindent 14 }}
+              app.kubernetes.io/component: prometheus
+      ports:
+        - protocol: TCP
+          port: 6333
+    {{- if .Values.qdrant.networkPolicy.allowFromNamespacePods.matchLabels }}
+    - from:
+        - podSelector:
+            matchLabels:
+              {{- toYaml .Values.qdrant.networkPolicy.allowFromNamespacePods.matchLabels | nindent 14 }}
+      ports:
+        - protocol: TCP
+          port: 6333
+        - protocol: TCP
+          port: 6334
+    {{- end }}
+    {{- range .Values.qdrant.networkPolicy.allowFromWorkloads }}
+    - from:
+        - podSelector:
+            {{- toYaml .podSelector | nindent 12 }}
+          {{- if .namespaceSelector }}
+          namespaceSelector:
+            {{- toYaml .namespaceSelector | nindent 12 }}
+          {{- end }}
+      ports:
+        - protocol: TCP
+          port: 6333
+        - protocol: TCP
+          port: 6334
+    {{- end }}
+    {{- with .Values.qdrant.networkPolicy.extraIngressFrom }}
+    - from:
+        {{- toYaml . | nindent 8 }}
+      ports:
+        - protocol: TCP
+          port: 6333
+        - protocol: TCP
+          port: 6334
+    {{- end }}
+{{- end }}

@@ -1,0 +1,37 @@
+{{- if and .Values.grafana.enabled .Values.grafana.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "hostel-tooling.grafanaFullname" . }}
+  labels:
+    {{- include "hostel-tooling.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "hostel-tooling.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: grafana
+  policyTypes:
+    - Ingress
+  {{- if or .Values.grafana.networkPolicy.allowFromNamespacePods.matchLabels .Values.grafana.networkPolicy.extraIngressFrom }}
+  ingress:
+    {{- if .Values.grafana.networkPolicy.allowFromNamespacePods.matchLabels }}
+    - from:
+        - podSelector:
+            matchLabels:
+              {{- toYaml .Values.grafana.networkPolicy.allowFromNamespacePods.matchLabels | nindent 14 }}
+      ports:
+        - protocol: TCP
+          port: 3000
+    {{- end }}
+    {{- with .Values.grafana.networkPolicy.extraIngressFrom }}
+    - from:
+        {{- toYaml . | nindent 8 }}
+      ports:
+        - protocol: TCP
+          port: 3000
+    {{- end }}
+  {{- else }}
+  ingress: []
+  {{- end }}
+{{- end }}

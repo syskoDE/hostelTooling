@@ -1,0 +1,11 @@
+1. Check the created resources:
+   kubectl get pods,svc,pvc -n {{ .Release.Namespace }}
+
+2. Port-forward Grafana locally:
+   kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "hostel-tooling.grafanaFullname" . }} 3001:{{ .Values.grafana.service.port }}
+
+3. Port-forward Prometheus locally:
+   kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "hostel-tooling.prometheusFullname" . }} 9090:{{ .Values.prometheus.service.port }}
+
+4. Grafana default credentials come from the chart values:
+   user: {{ .Values.grafana.adminUser }}

@@ -1,0 +1,28 @@
+# Example overrides for an Amazon EKS deployment.
+
+qdrant:
+  persistence:
+    storageClass: gp3
+  serviceAccount:
+    annotations: {}
+  networkPolicy:
+    # Example for later hostel access within the same namespace:
+    # allowFromWorkloads:
+    #   - podSelector:
+    #       matchLabels:
+    #         app.kubernetes.io/name: hostel
+    allowFromWorkloads: []
+
+prometheus:
+  persistence:
+    storageClass: gp3
+  serviceAccount:
+    annotations: {}
+
+grafana:
+  admin:
+    existingSecret: "hostel-tooling-grafana-admin"
+  persistence:
+    storageClass: gp3
+  serviceAccount:
+    annotations: {}

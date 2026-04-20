@@ -1,0 +1,54 @@
+open-webui:
+  persistence:
+    storageClass: managed-csi-premium
+
+  openaiBaseApiUrl: "http://hostel.hostel.svc.cluster.local:8000/v1"
+
+  ingress:
+    enabled: true
+    class: webapprouting.kubernetes.azure.com
+    host: "chat.syskoplan.cloud"
+    tls: true
+    annotations: {}
+
+  sso:
+    enabled: true
+    enableSignup: true
+    mergeAccountsByEmail: true
+    enableRoleManagement: false
+    enableGroupManagement: false
+
+    oidc:
+      enabled: true
+      clientId: "<entra-client-id>"
+      clientExistingSecret: open-webui-runtime
+      clientExistingSecretKey: oidc-client-secret
+      providerUrl: "https://login.microsoftonline.com/<tenant-id>/v2.0/.well-known/openid-configuration"
+      providerName: "Entra ID"
+      scopes: "openid email profile"
+
+  extraEnvVars:
+    - name: OPENAI_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: open-webui-runtime
+          key: openai-api-key
+    - name: WEBUI_SECRET_KEY
+      valueFrom:
+        secretKeyRef:
+          name: open-webui-runtime
+          key: webui-secret-key
+    - name: WEBUI_URL
+      value: "https://chat.syskoplan.cloud"
+    - name: OPENID_REDIRECT_URI
+      value: "https://chat.syskoplan.cloud/oauth/oidc/callback"
+    - name: ENABLE_OAUTH_PERSISTENT_CONFIG
+      value: "false"
+    - name: ENABLE_SIGNUP
+      value: "false"
+    - name: ENABLE_LOGIN_FORM
+      value: "false"
+    - name: ENABLE_PASSWORD_AUTH
+      value: "false"
+    - name: DEFAULT_USER_ROLE
+      value: "pending"

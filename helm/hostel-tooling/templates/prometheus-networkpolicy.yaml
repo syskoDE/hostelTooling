@@ -1,0 +1,37 @@
+{{- if and .Values.prometheus.enabled .Values.prometheus.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "hostel-tooling.prometheusFullname" . }}
+  labels:
+    {{- include "hostel-tooling.labels" . | nindent 4 }}
+    app.kubernetes.io/component: prometheus
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "hostel-tooling.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: prometheus
+  policyTypes:
+    - Ingress
+  {{- if or .Values.prometheus.networkPolicy.allowFromNamespacePods.matchLabels .Values.prometheus.networkPolicy.extraIngressFrom }}
+  ingress:
+    {{- if .Values.prometheus.networkPolicy.allowFromNamespacePods.matchLabels }}
+    - from:
+        - podSelector:
+            matchLabels:
+              {{- toYaml .Values.prometheus.networkPolicy.allowFromNamespacePods.matchLabels | nindent 14 }}
+      ports:
+        - protocol: TCP
+          port: 9090
+    {{- end }}
+    {{- with .Values.prometheus.networkPolicy.extraIngressFrom }}
+    - from:
+        {{- toYaml . | nindent 8 }}
+      ports:
+        - protocol: TCP
+          port: 9090
+    {{- end }}
+  {{- else }}
+  ingress: []
+  {{- end }}
+{{- end }}

@@ -1,0 +1,38 @@
+nameOverride: hostel-tooling
+fullnameOverride: hostel-tooling
+
+# Example overrides for an Azure Kubernetes Service deployment.
+
+qdrant:
+  persistence:
+    storageClass: managed-csi-premium
+  serviceAccount:
+    annotations: {}
+  networkPolicy:
+    # Example for later hostel access from another namespace:
+    # allowFromWorkloads:
+    #   - namespaceSelector:
+    #       matchLabels:
+    #         kubernetes.io/metadata.name: hostel
+    #     podSelector:
+    #       matchLabels:
+    #         app.kubernetes.io/name: hostel
+    allowFromWorkloads: []
+
+prometheus:
+  persistence:
+    storageClass: managed-csi-premium
+  serviceAccount:
+    annotations: {}
+
+grafana:
+  admin:
+    existingSecret: "hostel-tooling-grafana-admin"
+  persistence:
+    storageClass: managed-csi-premium
+  serviceAccount:
+    annotations: {}
+
+monitoring:
+  kubeStateMetrics:
+    enabled: true

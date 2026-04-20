@@ -1,0 +1,77 @@
+{{- if .Values.prometheus.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "hostel-tooling.prometheusFullname" . }}-config
+  labels:
+    {{- include "hostel-tooling.labels" . | nindent 4 }}
+    app.kubernetes.io/component: prometheus
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    rule_files:
+      - /etc/prometheus/rules.yml
+
+    scrape_configs:
+      - job_name: qdrant
+        metrics_path: /metrics
+        static_configs:
+          - targets: ["{{ include "hostel-tooling.qdrantFullname" . }}:{{ .Values.qdrant.service.port }}"]
+
+      - job_name: prometheus
+        static_configs:
+          - targets: ["{{ include "hostel-tooling.prometheusFullname" . }}:{{ .Values.prometheus.service.port }}"]
+{{- if .Values.monitoring.kubeStateMetrics.enabled }}
+
+      - job_name: kube-state-metrics
+        static_configs:
+          - targets:
+              - "{{ .Values.monitoring.kubeStateMetrics.serviceName }}.{{ .Values.monitoring.kubeStateMetrics.namespace }}.svc.cluster.local:{{ .Values.monitoring.kubeStateMetrics.port }}"
+{{- end }}
+  rules.yml: |
+    groups:
+      - name: qdrant-alerts
+        rules:
+          - alert: QdrantDown
+            expr: up{job="qdrant"} == 0
+            for: 1m
+            labels:
+              severity: critical
+            annotations:
+              summary: Qdrant ist nicht erreichbar
+{{- if .Values.monitoring.kubeStateMetrics.enabled }}
+      - name: workload-alerts
+        rules:
+          - alert: HostelDeploymentUnavailable
+            expr: kube_deployment_status_replicas_available{namespace="hostel",deployment="hostel"} < 1
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: hostel ist nicht verfuegbar
+          - alert: OpenWebUIStatefulSetUnavailable
+            expr: kube_statefulset_status_replicas_ready{namespace="hostel-access",statefulset="open-webui"} < 1
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: open-webui ist nicht verfuegbar
+          - alert: SonarQubeStatefulSetUnavailable
+            expr: kube_statefulset_status_replicas_ready{namespace="sonarqube",statefulset="sonarqube-sonarqube"} < 1
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: SonarQube ist nicht verfuegbar
+          - alert: GitlabRunnerDeploymentUnavailable
+            expr: kube_deployment_status_replicas_available{namespace="gitlab-runners",deployment="gitlab-runner"} < 1
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: GitLab Runner ist nicht verfuegbar
+{{- end }}
+{{- end }}

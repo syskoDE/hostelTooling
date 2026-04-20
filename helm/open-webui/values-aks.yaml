@@ -1,0 +1,23 @@
+open-webui:
+  persistence:
+    storageClass: managed-csi-premium
+
+  ingress:
+    enabled: false
+
+  openaiBaseApiUrl: "http://hostel.hostel.svc.cluster.local:8000/v1"
+
+  sso:
+    enabled: false
+
+  extraEnvVars:
+    - name: OPENAI_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: open-webui-runtime
+          key: openai-api-key
+    - name: WEBUI_SECRET_KEY
+      valueFrom:
+        secretKeyRef:
+          name: open-webui-runtime
+          key: webui-secret-key

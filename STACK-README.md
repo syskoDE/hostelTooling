@@ -1,6 +1,6 @@
-# Unicorn Tooling Stack
+# Hostel Tooling Stack
 
-Dieses Verzeichnis enthaelt das lokale Betriebs-Setup fuer den Vector- und Observability-Teil von Unicorn.
+Dieses Verzeichnis enthaelt das lokale Betriebs-Setup fuer den Vector- und Observability-Teil von Hostel.
 
 Ziel:
 
@@ -8,7 +8,7 @@ Ziel:
 - Metriken fuer den Vector Store bereitstellen
 - optional Logs und Traces fuer spaetere produktionsnahe Tests aktivieren
 
-Alle Befehle werden aus `unicornTooling` ausgefuehrt.
+Alle Befehle werden aus `hostelTooling` ausgefuehrt.
 
 ## Enthaltene Services
 
@@ -85,8 +85,8 @@ Logs eines Service:
 docker compose logs -f qdrant
 ```
 
-## Hinweise fuer Unicorn
+## Hinweise fuer Hostel
 
-- Der Stack ist bewusst getrennt vom eigentlichen `unicorn`-Applikationsrepo.
-- `unicornTooling` soll die produktionsnahe Betriebsumgebung vorbereiten, nicht den Applikationscode enthalten.
-- Fuer lokale Entwicklung kann Unicorn weiter Chroma oder andere Stores nutzen; fuer produktionsnahes Setup ist Qdrant hier der vorgesehene Startpunkt.
+- Der Stack ist bewusst getrennt vom eigentlichen `hostel`-Applikationsrepo.
+- `hostelTooling` soll die produktionsnahe Betriebsumgebung vorbereiten, nicht den Applikationscode enthalten.
+- Fuer lokale Entwicklung kann Hostel weiter Chroma oder andere Stores nutzen; fuer produktionsnahes Setup ist Qdrant hier der vorgesehene Startpunkt.
