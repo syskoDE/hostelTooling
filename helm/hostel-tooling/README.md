@@ -114,6 +114,11 @@ Das aktuelle `hostel`-Chart erwartet im Default:
 
 Wenn ihr Release-Namen oder Namespaces aendert, muessen `hostel/helm/hostel/values*.yaml` und die `Qdrant`-Freigabe zusammen angepasst werden.
 
+Wichtig:
+- Fuer jeden zusaetzlichen `hostel`-Namespace braucht `Qdrant` einen eigenen `allowFromWorkloads`-Eintrag.
+- Ein neues Projekt wie `hostel-mvv` funktioniert also nicht automatisch nur deshalb, weil `hostel` bereits freigeschaltet wurde.
+- Wenn diese Freigabe fehlt, zeigt sich das typischerweise als `ConnectTimeout` beim Zugriff von `hostel` auf `Qdrant`.
+
 Die Freigabe erfolgt ueber Pod-Labels in:
 
 - [values.yaml](/Users/t.bettmann/Documents/dev/Agents/SDLC-Design/hostelTooling/helm/hostel-tooling/values.yaml)
@@ -144,6 +149,26 @@ qdrant:
             app.kubernetes.io/name: hostel
 ```
 
+Beispiel fuer mehrere getrennte `hostel`-Namespaces:
+
+```yaml
+qdrant:
+  networkPolicy:
+    allowFromWorkloads:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: hostel
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: hostel
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: hostel-mvv
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: hostel
+```
+
 Damit darf nur genau diese Workload auf `Qdrant` zugreifen, waehrend der Rest des Clusters weiterhin ausgeschlossen bleibt.
 
 ### Empfohlene Reihenfolge
@@ -153,6 +178,8 @@ Damit darf nur genau diese Workload auf `Qdrant` zugreifen, waehrend der Rest de
 3. erst dann `hostel` deployen
 
 Praktisch ist es sinnvoll, die Freigabe in einer separaten Datei wie `values-hostel-access.yaml` zu halten, damit klar bleibt, welche Runtime darauf zugreifen darf.
+
+Bei jedem neuen `hostel`-Deployment sollte diese Datei bewusst mitgepflegt werden.
 
 ## Struktur
 

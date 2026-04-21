@@ -1,9 +1,16 @@
 qdrant:
   networkPolicy:
     allowFromWorkloads:
+      # Add one entry per Hostel namespace that should be allowed to reach Qdrant.
       - namespaceSelector:
           matchLabels:
             kubernetes.io/metadata.name: hostel
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: hostel
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: hostel-mvv
         podSelector:
           matchLabels:
             app.kubernetes.io/name: hostel
