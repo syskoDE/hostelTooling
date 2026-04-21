@@ -44,6 +44,8 @@ open-webui:
       value: "https://chat.syskoplan.cloud/oauth/oidc/callback"
     - name: ENABLE_OAUTH_PERSISTENT_CONFIG
       value: "false"
+    - name: ENABLE_OAUTH_GROUP_CREATION
+      value: "false"
     - name: ENABLE_SIGNUP
       value: "false"
     - name: ENABLE_LOGIN_FORM

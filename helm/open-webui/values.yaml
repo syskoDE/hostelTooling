@@ -2,6 +2,11 @@ open-webui:
   replicaCount: 1
   revisionHistoryLimit: 3
 
+  image:
+    # Explicit stable app pin. The vendored chart appVersion still points to
+    # 0.8.12, but production should run the newer upstream Open WebUI image.
+    tag: "v0.9.1"
+
   serviceAccount:
     name: ""
 
@@ -79,6 +84,8 @@ open-webui:
     - name: OPENID_REDIRECT_URI
       value: "https://chat.example.internal/oauth/oidc/callback"
     - name: ENABLE_OAUTH_PERSISTENT_CONFIG
+      value: "false"
+    - name: ENABLE_OAUTH_GROUP_CREATION
       value: "false"
     - name: ENABLE_SIGNUP
       value: "false"
